@@ -1,0 +1,7 @@
+workflow:
+  - agent: WebScraper
+    task: "Fetch AI news"
+  - agent: Summarizer
+    task: "Summarize in 3 lines"
+  - agent: Mailer
+    task: "aparnasingha3003@gmail.com"

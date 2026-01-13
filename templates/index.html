@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🤖 AutoFlow - No-Code Automation</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <div class="logo">
+                <span class="logo-icon">🤖</span>
+                <h1>AutoFlow</h1>
+            </div>
+            <p class="tagline">Write simple instructions. We do the rest.</p>
+        </header>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Left Panel - Instructions -->
+            <div class="panel input-panel">
+                <div class="panel-header">
+                    <h2>📝 Your Instructions</h2>
+                    <p>Write what you want to automate</p>
+                </div>
+                
+                <!-- Quick Templates -->
+                <div class="templates">
+                    <p class="templates-label">Quick Start:</p>
+                    <div class="template-buttons">
+                        <button class="template-btn" onclick="loadTemplate('news')">📰 News Summary</button>
+                        <button class="template-btn" onclick="loadTemplate('weather')">🌤️ Weather Report</button>
+                        <button class="template-btn" onclick="loadTemplate('research')">🔍 Research</button>
+                    </div>
+                </div>
+
+                <!-- YAML Editor -->
+                <div class="editor-container">
+                    <textarea id="yaml-input" placeholder="name: my_workflow
+description: What this does
+
+steps:
+  - name: step_1
+    action: get_news
+    topic: artificial intelligence
+
+  - name: step_2
+    action: summarize
+    input: step_1
+
+  - name: step_3
+    action: send_email
+    to: user@example.com
+    input: step_2"></textarea>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="action-buttons">
+                    <button class="btn btn-secondary" onclick="clearEditor()">🗑️ Clear</button>
+                    <button class="btn btn-secondary" onclick="validateYaml()">✅ Validate</button>
+                    <button class="btn btn-primary" onclick="runWorkflow()">
+                        <span class="btn-icon">▶️</span>
+                        Run Workflow
+                    </button>
+                </div>
+            </div>
+
+            <!-- Right Panel - Output -->
+            <div class="panel output-panel">
+                <div class="panel-header">
+                    <h2>📊 Results</h2>
+                    <p>See your automation in action</p>
+                </div>
+
+                <!-- Status -->
+                <div class="status-bar" id="status-bar">
+                    <span class="status-dot"></span>
+                    <span class="status-text">Ready to run</span>
+                </div>
+
+                <!-- Steps Progress -->
+                <div class="steps-container" id="steps-container">
+                    <div class="empty-state">
+                        <span class="empty-icon">🚀</span>
+                        <p>Run a workflow to see progress</p>
+                    </div>
+                </div>
+
+                <!-- Output -->
+                <div class="output-container">
+                    <h3>📄 Output</h3>
+                    <div class="output-box" id="output-box">
+                        <p class="output-placeholder">Results will appear here...</p>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <p>Built with ❤️ for the Hackathon | No coding required!</p>
+        </footer>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loading-overlay">
+        <div class="loading-content">
+            <div class="spinner"></div>
+            <p>Running your workflow...</p>
+        </div>
+    </div>
+
+    <script>
+       // Template YAML configurations
+// Template YAML configurations
+const templates = {
+    news: `workflow:
+  - agent: WebScraper
+    task: "Fetch AI news"
+  - agent: Summarizer
+    task: "Summarize in 3 lines"
+  - agent: Mailer
+    task: "aparnasingha3003@gmail.com"`,
+
+    weather: `workflow:
+  - agent: WebScraper
+    task: "Fetch weather for Mumbai"
+  - agent: Summarizer
+    task: "Summarize in 2 lines"
+  - agent: Mailer
+    task: "aparnasingha3003@gmail.com"`,
+
+    research: `workflow:
+  - agent: WebScraper
+    task: "Search latest machine learning trends"
+  - agent: Summarizer
+    task: "Create a short summary"
+  - agent: Mailer
+    task: "aparnasingha3003@gmail.com"`
+};
+
+        // Load template
+        function loadTemplate(type) {
+            document.getElementById('yaml-input').value = templates[type];
+            showNotification('Template loaded!', 'success');
+        }
+
+        // Clear editor
+        function clearEditor() {
+            document.getElementById('yaml-input').value = '';
+            document.getElementById('output-box').innerHTML = '<p class="output-placeholder">Results will appear here...</p>';
+            document.getElementById('steps-container').innerHTML = `
+                <div class="empty-state">
+                    <span class="empty-icon">🚀</span>
+                    <p>Run a workflow to see progress</p>
+                </div>
+            `;
+            updateStatus('ready', 'Ready to run');
+        }
+
+        // Validate YAML
+        function validateYaml() {
+            const yaml = document.getElementById('yaml-input').value;
+            
+            if (!yaml.trim()) {
+                showNotification('Please enter some instructions first!', 'error');
+                return false;
+            }
+
+            // Basic YAML validation
+            if (!yaml.includes('name:') || !yaml.includes('steps:')) {
+                showNotification('Missing required fields: name and steps', 'error');
+                return false;
+            }
+
+            showNotification('✅ YAML looks good!', 'success');
+            return true;
+        }
+
+        // Run workflow
+        async function runWorkflow() {
+            const yaml = document.getElementById('yaml-input').value;
+            
+            if (!yaml.trim()) {
+                showNotification('Please enter instructions first!', 'error');
+                return;
+            }
+
+            // Show loading
+            document.getElementById('loading-overlay').classList.add('show');
+            updateStatus('running', 'Running workflow...');
+
+            // Parse steps for display
+            const stepMatches = yaml.match(/- name: (\w+)/g) || [];
+            const steps = stepMatches.map(s => s.replace('- name: ', ''));
+            
+            // Show steps
+            displaySteps(steps);
+
+            try {
+                const response = await fetch('/run', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ yaml: yaml })
+                });
+
+                const data = await response.json();
+
+                // Hide loading
+                document.getElementById('loading-overlay').classList.remove('show');
+
+                if (data.success) {
+                    updateStatus('success', 'Workflow completed!');
+                    displayOutput(data.result);
+                    completeAllSteps(steps);
+                    showNotification('🎉 Workflow completed successfully!', 'success');
+                } else {
+                    updateStatus('error', 'Workflow failed');
+                    displayOutput('Error: ' + data.error);
+                    showNotification('❌ ' + data.error, 'error');
+                }
+
+            } catch (error) {
+                document.getElementById('loading-overlay').classList.remove('show');
+                updateStatus('error', 'Connection error');
+                showNotification('Failed to connect to server', 'error');
+                console.error(error);
+            }
+        }
+
+        // Display steps
+        function displaySteps(steps) {
+            const container = document.getElementById('steps-container');
+            container.innerHTML = steps.map((step, index) => `
+                <div class="step-item" id="step-${index}">
+                    <div class="step-number">${index + 1}</div>
+                    <div class="step-info">
+                        <span class="step-name">${step}</span>
+                        <span class="step-status pending">Pending</span>
+                    </div>
+                    <div class="step-loader"></div>
+                </div>
+            `).join('');
+
+            // Animate steps
+            steps.forEach((_, index) => {
+                setTimeout(() => {
+                    const stepEl = document.getElementById(`step-${index}`);
+                    if (stepEl) {
+                        stepEl.querySelector('.step-status').textContent = 'Running...';
+                        stepEl.querySelector('.step-status').className = 'step-status running';
+                    }
+                }, index * 1000);
+            });
+        }
+
+        // Complete all steps
+        function completeAllSteps(steps) {
+            steps.forEach((_, index) => {
+                const stepEl = document.getElementById(`step-${index}`);
+                if (stepEl) {
+                    stepEl.querySelector('.step-status').textContent = 'Complete ✓';
+                    stepEl.querySelector('.step-status').className = 'step-status complete';
+                    stepEl.classList.add('completed');
+                }
+            });
+        }
+
+        // Display output
+        function displayOutput(result) {
+            const outputBox = document.getElementById('output-box');
+            
+            if (typeof result === 'object') {
+                outputBox.innerHTML = `<pre>${JSON.stringify(result, null, 2)}</pre>`;
+            } else {
+                outputBox.innerHTML = `<div class="output-text">${result}</div>`;
+            }
+        }
+
+        // Update status
+        function updateStatus(type, text) {
+            const statusBar = document.getElementById('status-bar');
+            statusBar.className = `status-bar ${type}`;
+            statusBar.querySelector('.status-text').textContent = text;
+        }
+
+        // Show notification
+        function showNotification(message, type) {
+            // Remove existing notification
+            const existing = document.querySelector('.notification');
+            if (existing) existing.remove();
+
+            const notification = document.createElement('div');
+            notification.className = `notification ${type}`;
+            notification.textContent = message;
+            document.body.appendChild(notification);
+
+            setTimeout(() => notification.classList.add('show'), 100);
+            setTimeout(() => {
+                notification.classList.remove('show');
+                setTimeout(() => notification.remove(), 300);
+            }, 3000);
+        }
+    </script>
+</body>
+</html>
