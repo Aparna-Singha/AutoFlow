@@ -4,11 +4,20 @@
 ![Header](https://capsule-render.vercel.app/api?type=waving&color=0:667eea,100:764ba2&height=230&section=header&text=🤖%20AutoFlow&fontSize=70&fontColor=ffffff&animation=fadeIn&fontAlignY=35&desc=Write%20Simple%20Instructions.%20We%20Do%20The%20Rest.&descAlignY=55&descSize=20)
 
 <!-- Badges -->
+<!-- Badges -->
 <p>
-  <img src="https://img.shields.io/badge/Python-3.8+-3776AB?style=for-the-badge&logo=python&logoColor=white" alt="Python"/>
-  <img src="https://img.shields.io/badge/Flask-2.0+-000000?style=for-the-badge&logo=flask&logoColor=white" alt="Flask"/>
-  <img src="https://img.shields.io/badge/🤗%20Transformers-BART-FFD43B?style=for-the-badge" alt="Transformers"/>
-  <img src="https://img.shields.io/badge/License-MIT-22c55e?style=for-the-badge" alt="License"/>
+  <a href="https://www.python.org/">
+    <img src="https://img.shields.io/badge/Python-3.8+-3776AB?style=for-the-badge&logo=python&logoColor=white" alt="Python"/>
+  </a>
+  <a href="https://flask.palletsprojects.com/">
+    <img src="https://img.shields.io/badge/Flask-2.0+-000000?style=for-the-badge&logo=flask&logoColor=white" alt="Flask"/>
+  </a>
+  <a href="https://huggingface.co/facebook/bart-large-cnn">
+    <img src="https://img.shields.io/badge/🤗%20Transformers-BART-FFD43B?style=for-the-badge" alt="Transformers"/>
+  </a>
+  <a href="https://github.com/Aparna-Singha/autoflow/blob/main/LICENSE">
+    <img src="https://img.shields.io/badge/License-MIT-22c55e?style=for-the-badge" alt="License"/>
+  </a>
 </p>
 
 <!-- Typing Animation -->
